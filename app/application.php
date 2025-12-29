@@ -16,4 +16,8 @@ require_once(COMPOSER_PATH . '/autoload.php');
 \Core\Configs::createConfigsDB();
 require_once('Configs/app.php');
 require_once('Core/helpers.php');
+
+// Registrar listeners de eventos
+require_once('Configs/events.php');
+
 require_once('Configs/routers.php');

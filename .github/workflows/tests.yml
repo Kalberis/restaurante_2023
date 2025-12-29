@@ -1,0 +1,99 @@
+name: Tests & Security
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: pweb_restaurante
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+        ports:
+          - 3306:3306
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+        extensions: pdo, pdo_mysql, json, curl
+        coverage: xdebug
+
+    - name: Cache Composer dependencies
+      uses: actions/cache@v3
+      with:
+        path: vendor
+        key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+        restore-keys: ${{ runner.os }}-composer-
+
+    - name: Install dependencies
+      run: composer install --prefer-dist --no-progress
+
+    - name: Wait for MySQL
+      run: |
+        until mysqladmin ping -h"127.0.0.1" -u"root" -p"root" --silent; do
+          echo 'waiting for mysql...'
+          sleep 1
+        done
+
+    - name: Import database
+      run: |
+        mysql -h127.0.0.1 -uroot -proot pweb_restaurante < projeto/backup_pweb_restaurante.sql
+
+    - name: Run PHPUnit
+      run: vendor/bin/phpunit --coverage-text
+
+    - name: Upload coverage reports
+      uses: codecov/codecov-action@v3
+      if: always()
+
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+
+    - name: Check PHP syntax
+      run: find app -name '*.php' -exec php -l {} \;
+
+    - name: PHP Code Sniffer
+      run: |
+        composer require --dev squizlabs/php_codesniffer
+        ./vendor/bin/phpcs app --standard=PSR12 || true
+
+  security:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+
+    - name: Check for security vulnerabilities
+      run: |
+        composer install
+        composer require --dev sensiolabs/security-checker
+        ./vendor/bin/security-checker security:check || true

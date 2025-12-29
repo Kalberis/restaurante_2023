@@ -1,0 +1,243 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Restaurante API",
+    "version": "1.0.0",
+    "description": "API REST para gerenciamento de restaurante",
+    "contact": {
+      "name": "Suporte",
+      "email": "support@restaurante.local"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8000/api",
+      "description": "Desenvolvimento"
+    },
+    {
+      "url": "https://api.restaurante.com",
+      "description": "Produção"
+    }
+  ],
+  "paths": {
+    "/produtos": {
+      "get": {
+        "summary": "Lista produtos",
+        "tags": ["Produtos"],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": { "type": "integer", "default": 1 }
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "schema": { "type": "integer", "default": 15 }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de produtos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProductList"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Cria novo produto",
+        "tags": ["Produtos"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Product"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Produto criado"
+          },
+          "422": {
+            "description": "Validação falhou"
+          }
+        }
+      }
+    },
+    "/produtos/{id}": {
+      "get": {
+        "summary": "Obtém um produto",
+        "tags": ["Produtos"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Detalhes do produto"
+          },
+          "404": {
+            "description": "Produto não encontrado"
+          }
+        }
+      },
+      "put": {
+        "summary": "Atualiza produto",
+        "tags": ["Produtos"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Product"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Produto atualizado"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Deleta produto",
+        "tags": ["Produtos"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Produto deletado"
+          }
+        }
+      }
+    },
+    "/usuarios": {
+      "get": {
+        "summary": "Lista usuários",
+        "tags": ["Usuários"],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": { "type": "integer", "default": 1 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de usuários"
+          }
+        }
+      },
+      "post": {
+        "summary": "Cria novo usuário",
+        "tags": ["Usuários"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Usuário criado"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Product": {
+        "type": "object",
+        "required": ["nome", "preco"],
+        "properties": {
+          "nome": {
+            "type": "string",
+            "minLength": 3
+          },
+          "descricao": {
+            "type": "string"
+          },
+          "preco": {
+            "type": "number",
+            "format": "float",
+            "minimum": 0.01
+          }
+        }
+      },
+      "ProductList": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean" },
+          "data": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/Product" }
+          },
+          "pagination": {
+            "type": "object",
+            "properties": {
+              "total": { "type": "integer" },
+              "page": { "type": "integer" },
+              "per_page": { "type": "integer" },
+              "pages": { "type": "integer" }
+            }
+          }
+        }
+      },
+      "User": {
+        "type": "object",
+        "required": ["login", "email", "password"],
+        "properties": {
+          "login": {
+            "type": "string",
+            "minLength": 3
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 8
+          }
+        }
+      }
+    }
+  }
+}

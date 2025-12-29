@@ -1,0 +1,25 @@
+# .dockerignore - Reduz tamanho da imagem Docker
+
+node_modules/
+vendor/
+.git/
+.env
+.env.local
+.env.*.local
+.gitignore
+.github/
+.vscode/
+.idea/
+*.log
+storage/logs/
+*.tmp
+*.bak
+.DS_Store
+README.md
+MELHORIAS.md
+DOCKER.md
+docker-compose.yml
+Dockerfile
+projeto/
+tests/
+phpunit.xml

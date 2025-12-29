@@ -1,0 +1,53 @@
+services:
+  app:
+    build: .
+    container_name: restaurante_app
+    ports:
+      - "8000:80"
+    volumes:
+      - .:/var/www/html
+      - ./storage/logs:/var/www/html/storage/logs
+    environment:
+      - APP_ENV=development
+      - APP_DEBUG=true
+    depends_on:
+      - db
+    networks:
+      - restaurante
+
+  db:
+    image: mysql:8.0
+    container_name: restaurante_db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: pweb_restaurante
+      MYSQL_USER: restaurante
+      MYSQL_PASSWORD: secret123
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./projeto/backup_pweb_restaurante.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - restaurante
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: restaurante_phpmyadmin
+    environment:
+      PMA_HOST: db
+      PMA_USER: root
+      PMA_PASSWORD: root
+    ports:
+      - "8080:80"
+    depends_on:
+      - db
+    networks:
+      - restaurante
+
+volumes:
+  db_data:
+
+networks:
+  restaurante:
+    driver: bridge

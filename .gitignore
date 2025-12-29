@@ -1,4 +1,36 @@
+# Credenciais e Configurações Sensíveis
 vendor/
 composer.lock
 app/Configs/database.php
-protejo/Modelo e Enteidade e Relacionamento do Restaurante.mwb.bak
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# PHP
+.php-cs-fixer.cache
+
+# Logs
+storage/logs/
+*.log
+
+# Cache
+cache/
+.cache/
+
+# Uploads
+public/uploads/
+public/storage/
+
+# Projeto específico
+projeto/Modelo e Enteidade e Relacionamento do Restaurante.mwb.bak
+projeto/backup_*.sql
+*.bak
+*.tmp
